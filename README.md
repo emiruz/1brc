@@ -2,7 +2,7 @@
 
 ## Introduction
 
-[https://github.com/gunnarmorling/1brc](1BRC) data
+[1BRC](https://github.com/gunnarmorling/1brc) data
 looks like this:
 
 ```

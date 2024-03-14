@@ -108,7 +108,7 @@ sys     0m4.247s
 ```
 
 4. [1brc_trie.f90](1brc_trie.f90) -- Another
-Fortran implementation in XXX LoC; this time using
+Fortran implementation in 117 LoC; this time using
 a [trie](https://en.wikipedia.org/wiki/Trie)
 structure for O(1) hops! Its conceptually the
 same idea as the LCRS implementation above but

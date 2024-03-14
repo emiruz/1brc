@@ -88,7 +88,7 @@ At the time of writing the best known single
 threaded solution completed in ~25s.
 
 3. [1brc.f90](1brc.f90/) -- A Fortran implementation
-in 140 LoC, and my first ever Fortran program! It is
+in 136 LoC, and my first ever Fortran program! It is
 simple, direct, and runs in **2m9s**. Its written
 from scratch and uses a
 [binary prefix tree](https://en.wikipedia.org/wiki/Left-child_right-sibling_binary_tree)

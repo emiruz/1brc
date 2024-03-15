@@ -38,20 +38,22 @@ contains
   
   subroutine update(buffer, root)
     character(len=*), intent(in) :: buffer
+    character(len=1), parameter :: cr = achar(10)
     type(trie), pointer, intent(inout) :: root
     type(trie), pointer :: current
     type(trie_ptr), pointer :: temp_ptr
-    integer :: i, j, k
+    integer :: i, j, k, l
     character(len=1) :: c
     real :: f
     i = 1
+    l = len(buffer)
     current => root
-    do while (i <= len(buffer))
+    do while (i <= l)
        c = buffer(i:i)
        if (c == ';') then
           j = i+1
-          k = index(buffer(j:), achar(10))
-          f = str2real (buffer(j:j+k-2))
+          k = index(buffer(j:), cr)
+          f = str2real(buffer(j:j+k-2))
           i = j+k
           call update_stats(current, f)
           current => root

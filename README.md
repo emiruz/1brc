@@ -132,7 +132,7 @@ user    1m21.932s
 sys     0m3.638s
 ```
 
-4. [1brc_hash.f90](1brc_hash.f90) -- A Fortran
+5. [1brc_hash.f90](1brc_hash.f90) -- A Fortran
 hash table based implementation in 134 LoC. 
 It uses a version of the
 [FNV1-a](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1a_hash);

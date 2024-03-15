@@ -137,18 +137,19 @@ hash table based implementation in 134 LoC.
 It uses a version of the
 [FNV1-a](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1a_hash);
 hash algorithm + linear scan, to index an array
-directly. It completes in **46s**!
+directly. It completes in **44s**!
 ```
 gfortran -march=native -flto -ffast-math -Ofast -o 1brc 1brc_hash.f90
 time ./1brc | wc -l
 
 8875
 
-real    0m45.632s
-user    0m43.304s
-sys     0m2.252s
+real    0m43.873s
+user    0m39.283s
+sys     0m4.521s
+
 ```
 I'd note that at this point, just reading
 `measurements.txt` and breaking it into new
-lines was taking about 27s, so the rest of the
-processing only requires 19s!
+lines was taking about 20s, so the rest of the
+processing only requires 24s!

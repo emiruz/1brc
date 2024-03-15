@@ -27,7 +27,7 @@ contains
     real :: f
     
     off = merge (2, 1, str(1:1)=='-')
-    i   = index(str(off:),'.')
+    i   = len(str(off:))-1 !index(str(off:),'.')
     if (i == 2) then
        f = ichar(str(off:off)) - zero
     else 
@@ -41,16 +41,20 @@ contains
     character(len=*), intent(in) :: buffer
     type(row_ptr), intent(inout) :: hash_tbl(:)
     character(len=1), parameter  :: cr = achar(10)
-    integer :: i, j, k
+    integer :: x, i, j, k
     real    :: f
+    integer :: offs(3) = [5,6,4] 
     
     i = 1
     do while (i <= len(buffer))
-       j = index(buffer(i:), ';')
-       k = index(buffer(i+j:), cr)
-       f = str2real (buffer(i+j:i+j+k-2))
-       call update_hash_tbl(buffer(i:i+j-2), f, hash_tbl)
-       i = i+j+k
+       k = scan(buffer(i:), cr)
+       do x = 1,3
+          j = i + k - 1 - offs(x)
+          if (buffer(j:j)==';') exit
+       end do
+       f = str2real(buffer(j+1:i+k-2))
+       call update_hash_tbl(buffer(i:j-1), f, hash_tbl)
+       i = i + k
     end do
   end subroutine update
 
@@ -62,6 +66,7 @@ contains
     character(len=*), intent(in) :: key
     integer, intent(in) :: m
     integer :: i
+
     h = basis
     do i = 1, len(key)
        h = ieor(h, iachar(key(i:i), int64))
@@ -76,6 +81,7 @@ contains
     type(row), pointer :: vals
     integer :: h, l
     real, intent(in) :: val
+
     l = size(hash_tbl)
     h = hash(key, l)
     do
@@ -102,10 +108,11 @@ contains
     end do
   end subroutine update_hash_tbl
 
-  recursive subroutine display(hash_tbl)
+  subroutine display(hash_tbl)
     type(row_ptr), intent(in) :: hash_tbl(:)
     type(row), pointer :: vals
     integer :: i
+
     do i = 1, size(hash_tbl)
        if (associated(hash_tbl(i)%p)) then
           vals => hash_tbl(i)%p

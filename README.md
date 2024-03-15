@@ -44,9 +44,17 @@ that most of us are ignorant of the little things.
 
 Note: all the timings are single threaded and executed
 on my puny laptop: i7-1165G7 @ 2.80GHz, 16G RAM + SSD.
+The `measurements.txt` file is about 15.5Gb: it does
+not fit into RAM. Finally, my SSD is slow:
+```
+time cat measurements.txt > /dev/null
 
-I've written three single threaded solutions for
-different reasons:
+real    0m12.919s
+user    0m0.004s
+sys     0m4.653s
+```
+
+I've written several solutions for different reasons:
 
 1. [1brc.awk](1brc.awk) -- A naive and direct AWK
 solution in 11 LoC. Simple as it is, it completes in
@@ -54,15 +62,14 @@ about **6m34s**. This is the sort of code you might
 write in 10-15 minutes to just "get it done", yet one
 has to invest a considerable amount of effort to beat
 it.
-
 ```
-time cat measurements.txt | ./1brc.awk | wc -l
+time mawk -f 1brc.awk measurements.txt | wc -l
 
 8875
 
-real    6m34.425s
-user    6m30.106s
-sys     0m17.593s
+real    6m21.198s
+user    6m16.224s
+sys     0m4.943s
 ```
 
 2. [1brc.hs](1brc.hs) -- I'm a fan of Haskell because
@@ -73,7 +80,6 @@ particularly naively. It parses integers instead of
 floats and uses lazy bytestring instead of string,
 for performance. It uses `seq` tactically to force
 strict evaluation to avoid exceeding the memory.
-
 ```
 ghc -O2 1brc.hs
 time ./1brc | wc -l 
@@ -84,8 +90,9 @@ real    7m18.885s
 user    7m14.640s
 sys     0m5.075s
 ```
-At the time of writing the best known single 
-threaded solution completed in ~25s.
+At the time of writing the best known single threaded
+solution completed in about 25s. At around 250-300
+LoC.
 
 3. [1brc_lcrs.f90](1brc_lcrs.f90) -- A Fortran
 implementation in 136 LoC, and my first ever
@@ -95,7 +102,6 @@ in **2m9s**. Its written from scratch and uses a
 instead of a hash table. I've found the simplicity 
 of Fortran to be a very pleasant surprise, even
 though this kind of problem is far from its forte.
-
 ```
 gfortran -march=native -O3 -o 1brc 1brc_lcrs.f90
 time ./1brc | wc -l
@@ -107,15 +113,14 @@ user    2m4.470s
 sys     0m4.247s
 ```
 
-4. [1brc_trie.f90](1brc_trie.f90) -- Another
-Fortran implementation in 117 LoC; this time using
+4. [1brc_trie.f90](1brc_trie.f90) -- A Fortran
+implementation in 117 LoC; using
 a [trie](https://en.wikipedia.org/wiki/Trie)
 structure for O(1) hops! Its conceptually the
 same idea as the LCRS implementation above but
 significantly more efficient because it obviates
 the linear scan for siblings. It completes in
 **1m25s**!
-
 ```
 gfortran -march=native -O3 -o 1brc 1brc_trie.f90
 time ./1brc | wc -l
@@ -126,3 +131,24 @@ real    1m25.561s
 user    1m21.932s
 sys     0m3.638s
 ```
+
+4. [1brc_hash.f90](1brc_hash.f90) -- A Fortran
+hash table based implementation in 117 LoC. 
+It uses a version of the
+[FNV1-a](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1a_hash);
+hash algorithm + linear scan, to index an array
+directly. It completes in **46s**!
+```
+gfortran -march=native -flto -ffast-math -Ofast -o 1brc 1brc_hash.f90
+time ./1brc | wc -l
+
+8875
+
+real    0m45.632s
+user    0m43.304s
+sys     0m2.252s
+```
+I'd note that at this point, just reading
+`measurements.txt` and breaking it into new
+lines was taking about 27s, so the rest of the
+processing only requires 19s!

@@ -62,11 +62,10 @@ contains
     character(len=*), intent(in) :: key
     integer, intent(in) :: m
     integer :: i
-
     h = basis
     do i = 1, len(key)
        h = ieor(h, iachar(key(i:i), int64))
-       h = mod(h * prime, 2_int64**64)
+       h = mod(h * prime, 2_int64**32)
     end do
     h = mod (h,m)
   end function hash

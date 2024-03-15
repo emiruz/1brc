@@ -25,8 +25,8 @@ contains
     integer :: i, off
     integer, parameter :: zero = ichar('0')
     real :: f
-    off  = merge (2, 1, str(1:1)=='-')
-    i    = index(str(off:),'.')
+    off = merge (2, 1, str(1:1)=='-')
+    i   = index(str(off:),'.')
     if (i == 2) then
        f = ichar(str(off:off)) - zero
     else 
@@ -41,14 +41,13 @@ contains
     type(trie), pointer, intent(inout) :: root
     type(trie), pointer :: current
     type(trie_ptr), pointer :: temp_ptr
-    integer :: i, j, k, idx
+    integer :: i, j, k
     character(len=1) :: c
     real :: f
     i = 1
     current => root
     do while (i <= len(buffer))
        c = buffer(i:i)
-       idx = ichar(c)
        if (c == ';') then
           j = i+1
           k = index(buffer(j:), achar(10))
@@ -57,7 +56,7 @@ contains
           call update_stats(current, f)
           current => root
        else
-          temp_ptr => current%values(idx)
+          temp_ptr => current%values(ichar(c))
           if (.not. associated(temp_ptr%p)) allocate(temp_ptr%p)
           current => temp_ptr%p
           i = i + 1
@@ -66,8 +65,8 @@ contains
   end subroutine update
 
   subroutine update_stats(current, f)
-   type(trie), pointer, intent(inout) :: current
-   real, intent(in) :: f
+    type(trie), pointer, intent(inout) :: current
+    real, intent(in) :: f
     if (f < current%min) current%min = f
     if (f > current%max) current%max = f
     current%sum   = current%sum + f

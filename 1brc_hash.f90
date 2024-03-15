@@ -147,7 +147,7 @@ program one_brc
         exit
      end if
      start = len(buffer)-tail_len
-     off   = start + index(buffer(start:), achar(10))-1
+     off   = start + scan(buffer(start:), achar(10), back=.true.)-1
      call update(buffer(1:off), hash_tbl)
      call fseek(fd, off - len(buffer), 1)
      read_size = read_size - off

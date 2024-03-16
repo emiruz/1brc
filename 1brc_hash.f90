@@ -129,7 +129,7 @@ program one_brc
   use builder
   implicit none
 
-  integer, parameter :: buffer_size = 102400, tail_len=100
+  integer, parameter :: buffer_size = 65536, tail_len=100
   integer, parameter :: hash_tbl_size = 65535
   character(len=:), allocatable :: buffer
   integer(kind=8) :: fd, read_size, off, start

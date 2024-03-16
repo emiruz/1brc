@@ -153,3 +153,26 @@ I'd note that at this point, just reading
 `measurements.txt` and breaking it into new
 lines was taking about 20s, so the rest of the
 processing only requires 24s!
+
+
+6. [1brc_hash_mmap.f90](1brc_hash_mmap.f90) --
+A Fortran hash table based implementation
+additionally using using mmap via the C
+interface. It also processes bytes directly
+rather than characters: more fancy all around.
+It completes in **40s**!
+```
+gfortran -march=native -flto -ffast-math -Ofast -o 1brc 1brc_hash_mmap.f90
+time ./1brc | wc -l
+
+8875
+
+real    0m39.536s
+user    0m35.814s
+sys     0m3.561s
+
+```
+I suspect that this solution would be
+significantly faster on a machine with a fast
+SSD and enough memory for the whole file to
+fit.

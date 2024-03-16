@@ -76,11 +76,12 @@ contains
     integer(1), intent(in) :: key(:)
     type(row_ptr), intent(inout) :: hash_tbl(:)
     type(row), pointer :: vals
-    integer :: h, l
+    integer :: h, l, dir
     real, intent(in) :: val
 
-    l = size(hash_tbl)
-    h = hash(key, l)
+    l   = size(hash_tbl)
+    h   = hash(key, l)
+    dir = merge(1, -1, mod(h,2)==0)    
     do
        vals => hash_tbl(h)%p
        if (.not. associated(vals)) then
@@ -100,7 +101,7 @@ contains
           vals%count = vals%count + 1
           exit
        else
-          h = mod(h+1, l)
+          h = mod(h + dir, l)  
        end if
     end do
   end subroutine update_hash_tbl

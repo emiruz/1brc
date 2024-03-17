@@ -154,7 +154,6 @@ I'd note that at this point, just reading
 lines was taking about 20s, so the rest of the
 processing only requires 24s!
 
-
 6. [1brc_hash_mmap.f90](1brc_hash_mmap.f90) --
 A Fortran hash table based implementation
 additionally using using mmap via the C
@@ -176,3 +175,24 @@ I suspect that this solution would be
 significantly faster on a machine with a fast
 SSD and enough memory for the whole file to
 fit.
+
+7. [1brc_hash_mmap_openmp.f90](1brc_hash_mmap_openmp.f90) --
+Fortran, hash table + mmap + OpenMP for
+parallel processing. Timing based on 4 cores.
+It completes in **<10s**!
+```
+gfortran -fopenmp -march=native -ffast-math -O3 -o 1brc 1brc_hash_mmap_openmp.f90
+time ./1brc | wc -l
+
+8875
+
+real    0m9.522s
+user    0m51.326s
+sys     0m0.872s
+
+```
+I can see that the disk read speed is the bottle
+neck. The CPUs do not saturate, there is a high
+variance in timings and mmap seems to blocks if
+the number of threads is too high. I'm excited
+to repeat the test on better hardware.

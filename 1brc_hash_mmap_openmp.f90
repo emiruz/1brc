@@ -46,7 +46,7 @@ program one_brc
 
 
   integer, parameter :: parts = 16 ! 8 cores, 2 hyper-threads each.
-  integer, parameter :: hash_tbl_size = 65536
+  integer(8), parameter :: hash_tbl_size = 65536
   integer,parameter :: PROT_READ=1, MAP_PRIVATE=2, O_RDONLY=0
   character(len=16), target :: filename='measurements.txt'
   character(len=20), target :: c_filename  
@@ -157,11 +157,10 @@ contains
     end do
   end subroutine build
 
-  pure function hash(key, m) result(h)
+  pure function hash(key) result(h)
     use, intrinsic :: iso_fortran_env, only: int64
     implicit none
     integer(1), intent(in) :: key(:)
-    integer, intent(in) :: m
     integer(int64), parameter :: prime = 16777619_int64
     integer(int64), parameter :: basis = 2166136261_int64
     integer(int64) :: h
@@ -172,7 +171,7 @@ contains
        h = ieor(h, iachar(achar(key(i)),int64))
        h = mod(h * prime, 2_int64**32)
     end do
-    h = mod (h,m)
+    h = mod(h, hash_tbl_size)
   end function hash
 
   subroutine upsert(key, min_, max_, sum_, count_, hash_tbl)
@@ -186,7 +185,7 @@ contains
     type(row), pointer :: vals
     integer :: h, dir
 
-    h   = hash(key, hash_tbl_size)
+    h   = hash(key)
     dir = merge(1, -1, mod(h,2)==0)
     do
        vals => hash_tbl(h)%p

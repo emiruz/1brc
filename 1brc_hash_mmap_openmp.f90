@@ -44,7 +44,6 @@ program one_brc
      end function munmap
   end interface
 
-
   integer, parameter :: parts = 16 ! 8 cores, 2 hyper-threads each.
   integer(8), parameter :: hash_tbl_size = 65536
   integer,parameter :: PROT_READ=1, MAP_PRIVATE=2, O_RDONLY=0
@@ -158,20 +157,20 @@ contains
   end subroutine build
 
   pure function hash(key) result(h)
-    use, intrinsic :: iso_fortran_env, only: int64
+    use, intrinsic :: iso_fortran_env, only: int8, int32
     implicit none
     integer(1), intent(in) :: key(:)
-    integer(int64), parameter :: prime = 16777619_int64
-    integer(int64), parameter :: basis = 2166136261_int64
-    integer(int64) :: h
+    integer(int32), parameter :: prime = int(z'01000193', int32)
+    integer(int32), parameter :: basis = int( z'811C9DC5', int32)
+    integer(int32) :: h
     integer :: i
 
     h = basis
     do i = 1, size(key)
-       h = ieor(h, int(128 + key(i), int64))
-       h = mod(h * prime, 2_int64**64)
+       h = ieor(h, transfer([key(i), 0_int8,0_int8,0_int8], 0_int32))
+       h = h * prime
     end do
-    h = mod(h, hash_tbl_size)
+    h = mod(abs(h), hash_tbl_size)
   end function hash
 
   subroutine upsert(key, min_, max_, sum_, count_, hash_tbl)

@@ -167,8 +167,7 @@ contains
 
     h = basis
     do i = 1, size(key)
-       h = ieor(h, transfer([key(i), 0_int8,0_int8,0_int8], 0_int32))
-       h = h * prime
+       h = prime * ieor(h, transfer([key(i), 0_int8,0_int8,0_int8], 0_int32))
     end do
     h = mod(abs(h), hash_tbl_size)
   end function hash

@@ -8,7 +8,7 @@ program one_brc
   end type row_ptr
 
   type :: row
-     integer(1), allocatable :: key(:)
+     integer(1), pointer :: key(:) => null()
      real    :: min
      real    :: max
      real    :: sum

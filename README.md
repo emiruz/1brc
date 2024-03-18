@@ -35,17 +35,17 @@ The best
 uses custom SIMD instructions and completes in 0.15s:
 unbelievable.
 
-Writing some vaguely performant code turns out to be
-harder than it may seem because the little things add
-up when you do them a billion times, and it turns out
-that most of us are ignorant of the little things.
+Writing performant code turns out to be harder than it
+may seem because the little things add up when you do
+them a billion times.
 
-# This repository
+# Experiments
 
 Note: all the timings are single threaded and executed
-on my puny laptop: i7-1165G7 @ 2.80GHz, 16G RAM + SSD.
-The `measurements.txt` file is about 15.5Gb: it does
-not fit into RAM. Finally, my SSD is slow:
+on my puny laptop: XPS13, i7-1165G7 @ 2.80GHz, 16G RAM
++ SSD impeded by full disk encryption. The
+`measurements.txt` file is about 15.5Gb: it does not
+fit into RAM. Disk recall is relatively slow:
 ```
 time cat measurements.txt > /dev/null
 
@@ -54,14 +54,16 @@ user    0m0.004s
 sys     0m4.653s
 ```
 
-I've written several solutions for different reasons:
+List of experiments:
 
 1. [1brc.awk](1brc.awk) -- A naive and direct AWK
 solution in 11 LoC. Simple as it is, it completes in
 about **6m34s**. This is the sort of code you might
 write in 10-15 minutes to just "get it done", yet one
 has to invest a considerable amount of effort to beat
-it.
+it. It is also very useful for checking the output of
+more complicated implementations since 11 LoC is much
+easier to audit.
 ```
 time mawk -f 1brc.awk measurements.txt | wc -l
 
@@ -101,7 +103,7 @@ in **2m9s**. Its written from scratch and uses a
 [binary prefix tree](https://en.wikipedia.org/wiki/Left-child_right-sibling_binary_tree)
 instead of a hash table. I've found the simplicity 
 of Fortran to be a very pleasant surprise, even
-though this kind of problem is far from its forte.
+though this kind of problem is not its forte.
 ```
 gfortran -march=native -O3 -o 1brc 1brc_lcrs.f90
 time ./1brc | wc -l
@@ -135,7 +137,7 @@ sys     0m3.638s
 5. [1brc_hash.f90](1brc_hash.f90) -- A Fortran
 hash table based implementation in 134 LoC. 
 It uses a version of the
-[FNV1-a](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1a_hash);
+[FNV1-a](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1a_hash)
 hash algorithm + linear scan, to index an array
 directly. It completes in **44s**!
 ```
@@ -171,15 +173,14 @@ user    0m35.840s
 sys     0m1.379s
 
 ```
-I suspect that this solution would be
-significantly faster on a machine with a fast
-SSD and enough memory for the whole file to
-fit.
+I suspect that this solution would be significantly
+faster on a machine with a fast SSD and enough
+memory for the whole file to fit.
 
 7. [1brc_hash_mmap_openmp.f90](1brc_hash_mmap_openmp.f90) --
-Fortran, hash table + mmap + OpenMP for
-parallel processing. Timing based on 4 cores.
-Best completion time is **6s**!
+Fortran, hash table + mmap + OpenMP for parallel
+processing. Timing based on 4 cores. Best completion
+time is **6s**!
 ```
 gfortran -fopenmp -march=native -ffast-math -O3 -o 1brc 1brc_hash_mmap_openmp.f90
 time ./1brc | wc -l
@@ -190,8 +191,8 @@ real    0m6.270s
 user    0m18.014s
 sys     0m0.444s
 ```
-I can see that the disk read speed is the bottle
-neck. The CPUs do not saturate, there is a high
-variance in timings and mmap seems to blocks if
-the number of threads is too high. I'm excited
-to repeat the test on better hardware.
+I can see that the disk read speed is the bottleneck.
+The CPUs do not saturate, there is a high variance in
+timings and mmap seems to blocks if the number of
+threads is too high. I'm excited to repeat the test
+on better hardware.

@@ -168,8 +168,8 @@ contains
 
     h = basis
     do i = 1, size(key)
-       h = ieor(h, iachar(achar(key(i)),int64))
-       h = mod(h * prime, 2_int64**32)
+       h = ieor(h, int(128 + key(i), int64))
+       h = mod(h * prime, 2_int64**64)
     end do
     h = mod(h, hash_tbl_size)
   end function hash

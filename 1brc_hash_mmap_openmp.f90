@@ -44,7 +44,7 @@ program one_brc
      end function munmap
   end interface
 
-  integer, parameter :: parts = 16 ! 8 cores, 2 hyper-threads each.
+  integer, parameter :: parts = 16 !8 cores, 2 hyper-threads each.
   integer(8), parameter :: hash_tbl_size = 65536
   integer,parameter :: PROT_READ=1, MAP_PRIVATE=2, O_RDONLY=0
   character(len=16), target :: filename='measurements.txt'
@@ -67,8 +67,8 @@ program one_brc
   call c_f_pointer(cptr,buffer,[read_size])
 
   call chunk(buffer, read_size, parts, begins, ends)
-  
-  !$OMP PARALLEL DO num_threads(parts)
+
+  !$OMP PARALLEL DO num_threads(parts) schedule(DYNAMIC)
   do i = 1, parts
      begin_ = begins(i); end_ = ends(i)
      call parse(buffer(begin_:end_), 1+end_-begin_, hash_tbl(i,:))
@@ -174,6 +174,7 @@ contains
 
   subroutine upsert(key, min_, max_, sum_, count_, hash_tbl)
     implicit none
+    integer(1), parameter :: arr(4) = [0_1, 0_1, 0_1, 0_1]
     integer(1), intent(in) :: key(:)
     real,       intent(in) :: min_, max_, sum_
     integer,    intent(in) :: count_
@@ -181,8 +182,7 @@ contains
     type(row), pointer :: vals
     integer :: h, dir
 
-    h   = hash(key)
-    dir = merge(1, -1, mod(h,2)==0)
+    h = hash(key)
     do
        vals => hash_tbl(h)%p
        if (.not. associated(vals)) then
@@ -203,7 +203,7 @@ contains
           vals%count = vals%count + count_
           exit
        else
-          h = mod(h + dir, hash_tbl_size)
+          h = hash(transfer(h, arr))
        end if
     end do
   end subroutine upsert

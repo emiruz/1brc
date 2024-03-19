@@ -71,7 +71,7 @@ program one_brc
   !$OMP PARALLEL DO num_threads(parts)
   do i = 1, parts
      begin_ = begins(i); end_ = ends(i)
-     call build(buffer(begin_:end_), 1+end_-begin_, hash_tbl(i,:))
+     call parse(buffer(begin_:end_), 1+end_-begin_, hash_tbl(i,:))
   end do
   !$OMP END PARALLEL DO
 
@@ -133,7 +133,7 @@ contains
     f   = (f + (ns(off+i)-z) / 10.0) * merge(-1,1, off==2)
   end function arr2real
   
-  subroutine build(buffer, length, hash_tbl)
+  subroutine parse(buffer, length, hash_tbl)
     implicit none
     integer(kind=1), intent(in) :: buffer(:)
     type(row_ptr), intent(inout):: hash_tbl(:)
@@ -154,7 +154,7 @@ contains
        call upsert(buffer(i:j-1), f, f, f, 1, hash_tbl)
        i = i + k
     end do
-  end subroutine build
+  end subroutine parse
 
   pure function hash(key) result(h)
     use, intrinsic :: iso_fortran_env, only: int8, int32
@@ -175,9 +175,7 @@ contains
   subroutine upsert(key, min_, max_, sum_, count_, hash_tbl)
     implicit none
     integer(1), intent(in) :: key(:)
-    real,       intent(in) :: min_
-    real,       intent(in) :: max_
-    real,       intent(in) :: sum_
+    real,       intent(in) :: min_, max_, sum_
     integer,    intent(in) :: count_
     type(row_ptr), intent(inout) :: hash_tbl(:)
     type(row), pointer :: vals

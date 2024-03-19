@@ -8,7 +8,7 @@ program one_brc
   end type row_ptr
 
   type :: row
-     integer(1), pointer :: key(:) => null()
+     integer(1), allocatable :: key(:)
      real    :: min
      real    :: max
      real    :: sum
@@ -188,14 +188,14 @@ contains
     do
        vals => hash_tbl(h)%p
        if (.not. associated(vals)) then
-          allocate (hash_tbl(h)%p)
-          vals => hash_tbl(h)%p
+          allocate (vals)
           allocate(vals%key(size(key)))
-          vals%key   = key
-          vals%min   = min_
-          vals%max   = max_
-          vals%sum   = sum_
-          vals%count = count_
+          vals%key      = key
+          vals%min      = min_
+          vals%max      = max_
+          vals%sum      = sum_
+          vals%count    = count_
+          hash_tbl(h)%p => vals
           exit
        else if (size(vals%key)==size(key) .and. &
             all(vals%key==key)) then

@@ -189,7 +189,7 @@ time ./1brc | wc -l
 
 real    0m5.712s
 user    0m20.291s
-sys	    0m0.643s
+sys     0m0.643s
 ```
 Above results with `integer, parameter :: parts = 8`
 on my 4 core laptop (hyper-threaded). I can see that

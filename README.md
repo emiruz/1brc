@@ -43,7 +43,7 @@ them a billion times.
 
 Note: all the timings are single threaded and executed
 on my puny laptop: XPS13, i7-1165G7 @ 2.80GHz, 16G RAM
-+ SSD impeded by full disk encryption. The
+and SSD (impeded by full disk encryption). The
 `measurements.txt` file is about 15.5Gb: it does not
 fit into RAM. Disk recall is relatively slow:
 ```

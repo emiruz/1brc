@@ -96,7 +96,24 @@ At the time of writing the best known single threaded
 solution completed in about 25s. At around 250-300
 LoC.
 
-3. [1brc_lcrs.f90](1brc_lcrs.f90) -- A Fortran
+3. [1brc.pl](1brc.pl) -- A simple Prolog implementation
+in 18 LoC. It uses a DCG to parse the input left to
+right and build up a mutable hashtable. It would
+complete in **91min42s** (estimated from 1M rows since
+its so slow).
+```
+time swipl 1brc.pl | wc -l
+
+8875
+
+...
+```
+I suspect this could be made much faster by
+implementing a problem specific hash table. I suspect
+there is no way to make Prolog fast because backtracking
+implies lots of unnecessary scaffolding in this case.
+
+4. [1brc_lcrs.f90](1brc_lcrs.f90) -- A Fortran
 implementation in 136 LoC, and my first ever
 Fortran program! It is simple, direct, and runs
 in **2m9s**. Its written from scratch and uses a
@@ -115,7 +132,7 @@ user    2m4.470s
 sys     0m4.247s
 ```
 
-4. [1brc_trie.f90](1brc_trie.f90) -- A Fortran
+5. [1brc_trie.f90](1brc_trie.f90) -- A Fortran
 implementation in 118 LoC; using
 a [trie](https://en.wikipedia.org/wiki/Trie)
 structure for O(1) hops! Its conceptually the
@@ -134,7 +151,7 @@ user    1m21.932s
 sys     0m3.638s
 ```
 
-5. [1brc_hash.f90](1brc_hash.f90) -- A Fortran
+6. [1brc_hash.f90](1brc_hash.f90) -- A Fortran
 hash table based implementation in 134 LoC. 
 It uses a version of the
 [FNV1-a](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1a_hash)
@@ -156,7 +173,7 @@ I'd note that at this point, just reading
 lines was taking about 20s, so the rest of the
 processing only requires 24s!
 
-6. [1brc_hash_mmap.f90](1brc_hash_mmap.f90) --
+7. [1brc_hash_mmap.f90](1brc_hash_mmap.f90) --
 A Fortran hash table based implementation
 additionally using using mmap via the C
 interface. It also processes bytes directly
@@ -177,7 +194,7 @@ I suspect that this solution would be significantly
 faster on a machine with a fast SSD and enough
 memory for the whole file to fit.
 
-7. [1brc_hash_mmap_openmp.f90](1brc_hash_mmap_openmp.f90) --
+8. [1brc_hash_mmap_openmp.f90](1brc_hash_mmap_openmp.f90) --
 Fortran, hash table + mmap + OpenMP for parallel
 processing. Timing based on 4 cores. Best completion
 time is **6s**!

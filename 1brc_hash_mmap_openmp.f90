@@ -157,17 +157,15 @@ contains
   end subroutine parse
 
   pure function hash(key) result(h)
-    use, intrinsic :: iso_fortran_env, only: int8, int32
-    implicit none
     integer(1), intent(in) :: key(:)
-    integer(int32), parameter :: prime = int(z'01000193', int32)
-    integer(int32), parameter :: basis = int( z'811C9DC5', int32)
-    integer(int32) :: h
+    integer(4), parameter :: prime = int(z'01000193', 4)
+    integer(4), parameter :: basis = int( z'811C9DC5', 4)
+    integer(4) :: h
     integer :: i
 
     h = basis
     do i = 1, size(key)
-       h = prime * ieor(h, transfer([key(i), 0_int8,0_int8,0_int8], 0_int32))
+       h = prime * ieor(h, transfer([key(i), 0_1,0_1,0_1], 0_4))
     end do
     h = 1 + iand(h, hash_tbl_size - 1)
   end function hash
@@ -227,6 +225,5 @@ contains
           deallocate(str)
        end if
     end do
-  end subroutine display
-  
+  end subroutine display  
 end program one_brc

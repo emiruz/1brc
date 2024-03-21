@@ -45,7 +45,7 @@ program one_brc
   end interface
 
   integer, parameter :: parts = 16 !8 cores, 2 hyper-threads each.
-  integer(8), parameter :: hash_tbl_size = 65536
+  integer(4), parameter :: hash_tbl_size = 65536 ! must be power of 2.
   integer,parameter :: PROT_READ=1, MAP_PRIVATE=2, O_RDONLY=0
   character(len=16), target :: filename='measurements.txt'
   character(len=20), target :: c_filename  
@@ -169,7 +169,7 @@ contains
     do i = 1, size(key)
        h = prime * ieor(h, transfer([key(i), 0_int8,0_int8,0_int8], 0_int32))
     end do
-    h = mod(abs(h), hash_tbl_size)
+    h = 1 + iand(h, hash_tbl_size - 1)
   end function hash
 
   subroutine upsert(key, min_, max_, sum_, count_, hash_tbl)

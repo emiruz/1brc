@@ -127,12 +127,12 @@ contains
   
   subroutine parse(buffer, length, hash_tbl)
     integer(1), parameter :: cr = 10, scol = ichar(';')
+    integer, parameter :: offs(3) = [5,6,4]
     integer(kind=1), intent(in) :: buffer(:)
     type(row_ptr), intent(inout):: hash_tbl(:)
     integer(c_size_t), intent(in) :: length
     integer(c_size_t) :: x, i, j, k
     real    :: f
-    integer :: offs(3) = [5,6,4]
     
     i = 1
     do while (i <= length)

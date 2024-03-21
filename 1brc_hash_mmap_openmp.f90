@@ -186,9 +186,9 @@ contains
           exit
        else if (size(vals%key)==size(key) .and. &
             all(vals%key==key)) then
-          vals%min = min(vals%min, min_)
-          vals%max = max(vals%max, max_)
-          vals%sum = vals%sum + sum_
+          vals%min   = min(vals%min, min_)
+          vals%max   = max(vals%max, max_)
+          vals%sum   = vals%sum + sum_
           vals%count = vals%count + count_
           exit
        else

@@ -97,9 +97,9 @@ solution completed in about 25s. At around 250-300
 LoC.
 
 3. [1brc.pl](1brc.pl) -- A simple Prolog implementation
-in 18 LoC. It uses a DCG to parse the input left to
+in 21 LoC. It uses a DCG to parse the input left to
 right and build up a mutable hashtable. It would
-complete in **91min42s** (estimated from 1M rows since
+complete in **71min50s** (estimated from 1M rows since
 its so slow).
 ```
 time swipl 1brc.pl | wc -l

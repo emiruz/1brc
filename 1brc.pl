@@ -1,4 +1,3 @@
-:- use_module(library(dcg/basics)).
 :- initialization(parse, main).
 
 parse :-
@@ -9,9 +8,13 @@ parse :-
 		string_codes(Name, Key),
 	        format('~w = ~1f, ~1f, ~1f~n', [Name,Min,Max,Mean])), _).
 
-line(H)  --> string(K), ";", number(V), { update_hash(H,K,V) }.
-lines(_) --> [].
-lines(H) --> line(H), "\n", !, lines(H).
+lines(_,[],[]).
+lines(H,In,Out) :-
+    append(Ks, [0';|Rest],In),!,
+    append(Vs, [0'\n|Out0], Rest),!,
+    number_codes(V,Vs),
+    update_hash(H,Ks,V),
+    lines(H, Out0, Out).
 
 update_hash(H, K, V) :-
     (   ht_update(H, K, (Min0, Max0, Sum0, Count0), New)

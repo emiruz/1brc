@@ -114,6 +114,7 @@ contains
   end subroutine chunk
 
   pure function arr2real (ns) result(f)
+    !$OMP DECLARE SIMD(arr2real)
     integer(1), parameter :: z = ichar('0'), m=ichar('-')
     integer(1), intent(in) :: ns(:)
     integer :: i, off

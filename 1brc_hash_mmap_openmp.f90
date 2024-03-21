@@ -127,7 +127,6 @@ contains
   
   subroutine parse(buffer, length, hash_tbl)
     integer(1), parameter :: cr = 10, scol = ichar(';')
-    integer, parameter :: offs(3) = [5,6,4]
     integer(kind=1), intent(in) :: buffer(:)
     type(row_ptr), intent(inout):: hash_tbl(:)
     integer(c_size_t), intent(in) :: length
@@ -137,8 +136,8 @@ contains
     i = 1
     do while (i <= length)
        k = findloc(buffer(i:), cr, dim=1)
-       do x = 1,3
-          j = i + k - 1 - offs(x)
+       do x = 4,6
+          j = i + k - 1 - x
           if (buffer(j)==scol) exit
        end do
        f = arr2real(buffer(j+1:i+k-2))

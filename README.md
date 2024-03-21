@@ -41,11 +41,11 @@ them a billion times.
 
 # Experiments
 
-Note: all the timings are single threaded and executed
-on my puny laptop: XPS13, i7-1165G7 @ 2.80GHz, 16G RAM
-and SSD (impeded by full disk encryption). The
+Note: all the timings were performed on my puny laptop:
+XPS13, i7-1165G7 @ 2.80GHz, 16G RAM and SSD (SATA). The
 `measurements.txt` file is about 15.5Gb: it does not
-fit into RAM. Disk recall is relatively slow:
+fit into RAM. Maximum disk sequential read rate is
+about 560MB/s:
 ```
 time cat measurements.txt > /dev/null
 

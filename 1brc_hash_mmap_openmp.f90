@@ -9,9 +9,7 @@ program one_brc
 
   type :: row
      integer(1), allocatable :: key(:)
-     real    :: min
-     real    :: max
-     real    :: sum
+     real    :: min, max, sum
      integer :: count
   end type row
   
@@ -29,12 +27,8 @@ program one_brc
 
      type(c_ptr) function mmap(addr,len,prot,flags,fildes,off) bind(c,name='mmap')
        use iso_c_binding
-       integer(c_int), value :: addr
-       integer(c_size_t), value :: len
-       integer(c_int), value :: prot
-       integer(c_int), value :: flags
-       integer(c_int), value :: fildes
-       integer(c_size_t), value :: off
+       integer(c_size_t), value :: len, off
+       integer(c_int), value :: addr, prot, flags, fildes
      end function mmap
 
      integer function munmap(addr, len) bind(c,name='munmap')
@@ -117,14 +111,12 @@ contains
        i = i+x
     end do
     begins(n)=i; ends(n) = length
-
   end subroutine chunk
 
   pure function arr2real (ns) result(f)
-    implicit none
+    integer(1), parameter :: z = ichar('0'), m=ichar('-')
     integer(1), intent(in) :: ns(:)
     integer :: i, off
-    integer(1), parameter :: z = ichar('0'), m=ichar('-')
     real :: f
     
     off = merge (2, 1, ns(1) == m)
@@ -134,11 +126,10 @@ contains
   end function arr2real
   
   subroutine parse(buffer, length, hash_tbl)
-    implicit none
+    integer(1), parameter :: cr = 10, scol = ichar(';')
     integer(kind=1), intent(in) :: buffer(:)
     type(row_ptr), intent(inout):: hash_tbl(:)
     integer(c_size_t), intent(in) :: length
-    integer(1), parameter :: cr = 10, scol = ichar(';')
     integer(c_size_t) :: x, i, j, k
     real    :: f
     integer :: offs(3) = [5,6,4]

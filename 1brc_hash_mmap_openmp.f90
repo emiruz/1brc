@@ -38,43 +38,43 @@ program one_brc
      end function munmap
   end interface
 
-  integer, parameter :: parts = 16 !8 cores, 2 hyper-threads each.
+  integer, parameter :: parts = 8 !8 cores, 2 hyper-threads each.
   integer(4), parameter :: hash_tbl_size = 65536 ! must be power of 2.
   integer,parameter :: PROT_READ=1, MAP_PRIVATE=2, O_RDONLY=0
   character(len=16), target :: filename='measurements.txt'
   character(len=20), target :: c_filename  
   type(row_ptr) :: hash_tbl(parts, hash_tbl_size)
   type(c_ptr) :: cptr
-  integer(c_size_t) :: read_size, off=0
+  integer(c_size_t) :: read_size, chunk_size, begin_, end_, i, ret
   integer(c_int) :: fd = 10
   integer(kind=1), dimension(:), pointer, contiguous :: buffer
-  integer(8) :: i, ret
   type(c_ptr) :: c_filename_ptr
-  integer(8), allocatable :: begins(:), ends(:), begin_, end_
-  
+
   inquire(file=filename, size=read_size)
   c_filename = trim(filename) // c_null_char
   c_filename_ptr = c_loc(c_filename)
   fd = open(c_loc(c_filename),O_RDONLY)
-  cptr = mmap(0,read_size,PROT_READ,MAP_PRIVATE,fd,off)
+  cptr = mmap(0,read_size,PROT_READ,MAP_PRIVATE,fd,0_c_size_t)
   fd = close(fd)
   call c_f_pointer(cptr,buffer,[read_size])
+  chunk_size = (read_size / parts) + merge(1,0, mod(read_size,parts) /= 0)
 
-  call chunk(buffer, read_size, parts, begins, ends)
-
-  !$OMP PARALLEL DO num_threads(parts) schedule(DYNAMIC)
+  !$OMP PARALLEL DO num_threads(parts) schedule(DYNAMIC) private(begin_,end_)
   do i = 1, parts
-     begin_ = begins(i); end_ = ends(i)
-     call parse(buffer(begin_:end_), 1+end_-begin_, hash_tbl(i,:))
+     begin_ = 1 + (i-1) * chunk_size
+     if (begin_ < read_size) then
+        end_ = min(begin_ + chunk_size-1, read_size)
+        call parse(buffer, begin_, end_, hash_tbl(i,:))
+     end if
   end do
   !$OMP END PARALLEL DO
-
+  
   if (parts > 1) call foldl(hash_tbl(1,:), hash_tbl(2:,:))
   call display(hash_tbl(1,:))
   ret = munmap(cptr, read_size)
 
 contains
-
+  
   recursive subroutine foldl (h0, hs)
     implicit none
     type(row_ptr), intent(inout) :: h0(:)
@@ -91,28 +91,6 @@ contains
     call foldl(h0, hs(2:,:))
   end subroutine foldl
 
-  subroutine chunk(buffer, length, n, begins, ends)
-    implicit none
-    integer, parameter :: tail = 100 ! Problem for very small files!
-    integer(1), intent(in) :: buffer(:)
-    integer(c_size_t), intent(in) :: length
-    integer(4), intent(in) :: n
-    integer(8), allocatable, intent(out) :: begins(:), ends(:)
-    integer(8) :: x, p, i, j, k
-
-    allocate(begins(n)); allocate(ends(n))
-    i = 1; p = (length-1) / n
-    do k = 1, n-1
-       begins(k) = i
-       j = i+p
-       i = j-tail
-       x = findloc(buffer(i:j), 10, dim=1)
-       ends(k) = i+x-1
-       i = i+x
-    end do
-    begins(n)=i; ends(n) = length
-  end subroutine chunk
-
   pure function arr2real (ns) result(f)
     !$OMP DECLARE SIMD(arr2real)
     integer(1), parameter :: z = ichar('0'), m=ichar('-')
@@ -125,17 +103,17 @@ contains
     f   = -z + merge(ns(off)*1, (ns(off)-z)*10 + ns(off+1), i==2)
     f   = (f + (ns(off+i)-z) / 10.0) * merge(-1,1, off==2)
   end function arr2real
-  
-  subroutine parse(buffer, length, hash_tbl)
+
+  subroutine parse(buffer, begin_, end_, hash_tbl)
     integer(1), parameter :: cr = 10, scol = ichar(';')
     integer(kind=1), intent(in) :: buffer(:)
     type(row_ptr), intent(inout):: hash_tbl(:)
-    integer(c_size_t), intent(in) :: length
+    integer(c_size_t), intent(in) :: begin_, end_
     integer(c_size_t) :: x, i, j, k
     real    :: f
-    
-    i = 1
-    do while (i <= length)
+
+    i = merge(begin_, begin_+findloc(buffer(begin_:), cr, dim=1), begin_==1)
+    do while (i-1 <= end_ .and. i <= read_size)
        k = findloc(buffer(i:), cr, dim=1)
        do x = 4,6
           j = i + k - 1 - x
@@ -186,7 +164,7 @@ contains
           hash_tbl(h)%p => vals
           exit
        else if (size(vals%key)==l .and. &
-            all(vals%key(size(vals%key):-1:1) == key(l:-1:1))) then
+            all(vals%key == key)) then
           vals%min   = min(vals%min, min_)
           vals%max   = max(vals%max, max_)
           vals%sum   = vals%sum + sum_

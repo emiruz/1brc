@@ -141,8 +141,7 @@ contains
           vals%count    = count_
           hash_tbl(h)%p => vals
           exit
-       else if (size(vals%key)==l .and. &
-            all(vals%key == key)) then
+       else if (size(vals%key)==l .and. all(vals%key==key)) then
           vals%min   = min(vals%min, min_)
           vals%max   = max(vals%max, max_)
           vals%sum   = vals%sum + sum_

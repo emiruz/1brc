@@ -169,14 +169,15 @@ contains
     integer,    intent(in) :: count_
     type(row_ptr), intent(inout) :: hash_tbl(:)
     type(row), pointer :: vals
-    integer :: h, dir
+    integer :: l, h, dir
 
     h = hash(key)
+    l = size(key)
     do
        vals => hash_tbl(h)%p
        if (.not. associated(vals)) then
           allocate (vals)
-          allocate(vals%key(size(key)))
+          allocate(vals%key(l))
           vals%key      = key
           vals%min      = min_
           vals%max      = max_
@@ -184,8 +185,8 @@ contains
           vals%count    = count_
           hash_tbl(h)%p => vals
           exit
-       else if (size(vals%key)==size(key) .and. &
-            all(vals%key==key)) then
+       else if (size(vals%key)==l .and. &
+            all(vals%key(size(vals%key):-1:1) == key(l:-1:1))) then
           vals%min   = min(vals%min, min_)
           vals%max   = max(vals%max, max_)
           vals%sum   = vals%sum + sum_

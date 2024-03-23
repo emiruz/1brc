@@ -113,14 +113,14 @@ contains
 
     i = merge(begin_, begin_+findloc(buffer(begin_:), cr, dim=1), begin_==1)
     do while (i-1 <= end_ .and. i <= read_size)
-       k = findloc(buffer(i:), cr, dim=1)
+       j = -1 + i + findloc(buffer(i:), scol, dim=1)
        do x = 4,6
-          j = i + k - 1 - x
-          if (buffer(j)==scol) exit
+          k = j + x
+          if (buffer(k)==cr) exit
        end do
-       f = arr2real(buffer(j+1:i+k-2))
+       f = arr2real(buffer(j+1:k-1))
        call upsert(buffer(i:j-1), f, f, f, 1, hash_tbl)
-       i = i + k
+       i = k+1
     end do
   end subroutine parse
 

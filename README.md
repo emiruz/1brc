@@ -180,8 +180,7 @@ interface. It also processes bytes directly
 rather than characters: more fancy all around.
 It completes in **38s**!
 ```
-gfortran -march=native -flto -ffast-math -Ofast \
-         -o 1brc 1brc_hash_mmap.f90
+gfortran -march=native -ffast-math -Ofast -o 1brc 1brc_hash_mmap.f90
 time ./1brc | wc -l
 
 8875
@@ -200,8 +199,7 @@ Fortran, hash table + mmap + OpenMP for parallel
 processing. Timing based on 4 cores. Best completion
 time is **6s**!
 ```
-gfortran-13 -fopenmp-simd -fopenmp -march=native -ffast-math \
-            -O3 -o 1brc 1brc_hash_mmap_openmp.f90
+gfortran-13 -fopenmp -march=native -ffast-math -O3 -o 1brc 1brc_hash_mmap_openmp.f90
 time ./1brc | wc -l
 
 8875

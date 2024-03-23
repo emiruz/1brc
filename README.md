@@ -177,16 +177,16 @@ A Fortran hash table based implementation
 additionally using using mmap via the C
 interface. It also processes bytes directly
 rather than characters: more fancy all around.
-It completes in **32s**!
+It completes in **30s**!
 ```
-gfortran -march=native -ffast-math -Ofast -o 1brc 1brc_hash_mmap.f90
+gfortran-13 -march=native -ffast-math -O3 -o 1brc 1brc_hash_mmap.f90
 time ./1brc | wc -l
 
 8875
 
-real    0m31.816s
-user    0m30.837s
-sys     0m0.684s
+real    0m30.414s
+user    0m28.744s
+sys     0m1.037s
 ```
 I suspect that this solution would be significantly
 faster on a machine with a fast SSD and enough

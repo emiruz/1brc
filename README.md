@@ -166,7 +166,6 @@ time ./1brc | wc -l
 real    0m43.873s
 user    0m39.283s
 sys     0m4.521s
-
 ```
 I'd note that at this point, just reading
 `measurements.txt` and breaking it into new
@@ -178,17 +177,16 @@ A Fortran hash table based implementation
 additionally using using mmap via the C
 interface. It also processes bytes directly
 rather than characters: more fancy all around.
-It completes in **38s**!
+It completes in **32s**!
 ```
 gfortran -march=native -ffast-math -Ofast -o 1brc 1brc_hash_mmap.f90
 time ./1brc | wc -l
 
 8875
 
-real    0m37.513s
-user    0m35.840s
-sys     0m1.379s
-
+real    0m31.816s
+user    0m30.837s
+sys     0m0.684s
 ```
 I suspect that this solution would be significantly
 faster on a machine with a fast SSD and enough

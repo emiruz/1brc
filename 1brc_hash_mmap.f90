@@ -49,7 +49,6 @@ program one_brc
   integer(kind=1), dimension(:), pointer, contiguous :: buffer
   integer(8) :: i, ret
   type(c_ptr) :: c_filename_ptr
-  integer(8), allocatable :: begins(:), ends(:), begin_, end_
   
   inquire(file=filename, size=read_size)
   c_filename = trim(filename) // c_null_char

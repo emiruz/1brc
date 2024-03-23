@@ -195,19 +195,19 @@ memory for the whole file to fit.
 8. [1brc_hash_mmap_openmp.f90](1brc_hash_mmap_openmp.f90) --
 Fortran, hash table + mmap + OpenMP for parallel
 processing. Timing based on 4 cores. Best completion
-time is **6s**!
+time is **9s**!
 ```
 gfortran-13 -fopenmp -march=native -ffast-math -O3 -o 1brc 1brc_hash_mmap_openmp.f90
 time ./1brc | wc -l
 
 8875
 
-real    0m5.712s
-user    0m20.291s
-sys     0m0.643s
+real    0m8.730s
+user    1m4.247s
+sys     0m1.391s
+
 ```
 Above results with `integer, parameter :: parts = 8`
 on my 4 core laptop (hyper-threaded). I can see that
 the disk read speed is the bottleneck. The CPUs do
-not saturate. Using gfortran-13 reduces the variance
-in runs greatly compared to gfortran-10.
+not saturate.

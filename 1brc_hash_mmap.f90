@@ -132,7 +132,6 @@ contains
        vals => hash_tbl(h)%p
        if (.not. associated(vals)) then
           allocate (vals)
-          allocate(vals%key(l))
           vals%key      = key
           vals%min      = min_
           vals%max      = max_
